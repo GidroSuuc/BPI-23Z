@@ -1,0 +1,49 @@
+# 1. Клонируем и настраиваем
+git clone <ваш-репозиторий>
+cd crm_system
+
+# 2. Создаем виртуальное окружение
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 3. Устанавливаем зависимости
+pip install -r requirements.txt
+
+# 4. Настраиваем переменные окружения
+cp .env.example .env
+# Отредактируйте .env файл
+
+# 5. Запускаем базу данных (через Docker)
+docker-compose up -d postgres redis
+
+# 6. Создаем миграции
+alembic revision --autogenerate -m "Initial"
+alembic upgrade head
+
+# 7. Запускаем сервер
+uvicorn main:app --reload
+
+# Или через Docker
+docker-compose up -d
+
+
+#Запуск тестов
+
+# Установка тестовых зависимостей
+pip install pytest pytest-asyncio pytest-cov httpx
+
+# Запуск всех тестов
+pytest tests/ -v
+
+# Запуск с покрытием кода
+pytest tests/ --cov=app --cov-report=html
+
+# Запуск определенной категории тестов
+pytest tests/test_auth.py -v
+pytest tests/integration/ -v
+
+# Запуск с отображением прогресса
+pytest tests/ -v --tb=short
+
+# В Docker
+docker-compose run backend pytest tests/
